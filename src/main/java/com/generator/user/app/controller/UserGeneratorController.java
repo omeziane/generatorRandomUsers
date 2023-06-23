@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,8 +34,13 @@ import java.util.List;
 @Api(tags = "User Management")
 public class UserGeneratorController
 {
+
    @Autowired
    UserService service;
+   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+   private int recordsFailed = 0;
+   private boolean exceptionCaught = false;
+   private String errorMessage = "";
 
    @ApiOperation(value = "Generate Users", notes = "Generates a JSON file containing a specified number of users.")
    @ApiResponses(value = {
@@ -68,17 +75,10 @@ public class UserGeneratorController
    @PostMapping(value = "batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
    public ResponseEntity<Object> uploadUsersFile(@RequestParam("file") MultipartFile file) {
       try {
-         // Read the file content as a JSON tree
-         ObjectMapper objectMapper = new ObjectMapper();
-         JsonNode jsonNode = objectMapper.readTree(file.getInputStream());
-
          // Logic to process the uploaded file and store the users in the database
          List<UserInsertDTO> users = processUploadedFile(file);
          int totalRecords = users.size();
          int recordsImported = 0;
-         int recordsFailed = 0;
-         boolean exceptionCaught = false;
-         String errorMessage = "";
 
          // Iterate through the users and attempt to save them in the database
          for (UserInsertDTO user : users) {
@@ -86,9 +86,7 @@ public class UserGeneratorController
                service.insert(user);
                recordsImported++;
             } catch (Exception e) {
-               recordsFailed++;
-               exceptionCaught = true;
-               errorMessage = e.getMessage();
+               handleInsertException(e);
             }
          }
 
@@ -115,6 +113,12 @@ public class UserGeneratorController
          // Other exceptions occurred
          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON file.");
       }
+   }
+
+   private void handleInsertException(Exception e) {
+      recordsFailed++;
+      exceptionCaught = true;
+      errorMessage = e.getMessage();
    }
 
    @ApiOperation(value = "Search")
@@ -249,8 +253,13 @@ public class UserGeneratorController
                user.setFirstName(userNode.get("firstName").asText());
                user.setLastName(userNode.get("lastName").asText());
                // Convert birthDate string to Date
-               long birthDateString = Long.valueOf(userNode.get("birthDate").asText());
-               Date birthDate = new Date(birthDateString);
+               Date birthDate = null;
+               try {
+                  birthDate = formatter.parse(userNode.get("birthDate").asText());
+               } catch (ParseException e) {
+                  throw new RuntimeException("Error inserting date" + e.getMessage());
+               }
+               ;
                user.setBirthDate(birthDate);
                user.setCity(userNode.get("city").asText());
                user.setCountry(userNode.get("country").asText());

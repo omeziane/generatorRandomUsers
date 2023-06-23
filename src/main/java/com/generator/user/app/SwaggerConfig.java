@@ -29,12 +29,6 @@ public class SwaggerConfig extends WebMvcConfigurationSupport
    @Value("${app.swagger.version}")
    private String version;
 
-   @Value("${app.swagger.license.name}")
-   private String license;
-
-   @Value("${app.swagger.license.url}")
-   private String licenseUrl;
-
    @Value("${app.swagger.license.contact.name}")
    private String contactName;
 
@@ -62,9 +56,9 @@ public class SwaggerConfig extends WebMvcConfigurationSupport
               }).apiInfo(apiInfo());
    }
 
-   private ApiInfo apiInfo()
+   public ApiInfo apiInfo()
    {
-      return new ApiInfoBuilder().title(title).description(description).version(version).license(license).licenseUrl(licenseUrl)
+      return new ApiInfoBuilder().title(title).description(description).version(version)
             .contact(new Contact(contactName, contactUrl, contactMail)).build();
    }
 
@@ -74,5 +68,61 @@ public class SwaggerConfig extends WebMvcConfigurationSupport
       registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
       registry.addResourceHandler("/h2-console/**").addResourceLocations("classpath:/META-INF/resources/");
       registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+   }
+
+   public void setBasePackage(String basePackage) {
+      this.basePackage = basePackage;
+   }
+
+   public String getBasePackage() {
+      return basePackage;
+   }
+
+   public void setTitle(String title) {
+      this.title = title;
+   }
+
+   public String getTitle() {
+      return title;
+   }
+
+   public void setDescription(String description) {
+      this.description = description;
+   }
+
+   public String getDescription() {
+      return description;
+   }
+
+   public void setVersion(String version) {
+      this.version = version;
+   }
+
+   public String getVersion() {
+      return version;
+   }
+
+   public void setContactName(String contactName) {
+      this.contactName = contactName;
+   }
+
+   public String getContactName() {
+      return contactName;
+   }
+
+   public void setContactUrl(String contactUrl) {
+      this.contactUrl = contactUrl;
+   }
+
+   public String getContactUrl() {
+      return contactUrl;
+   }
+
+   public void setContactMail(String contactMail) {
+      this.contactMail = contactMail;
+   }
+
+   public String getContactMail() {
+      return contactMail;
    }
 }

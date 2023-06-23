@@ -4,6 +4,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class PasswordUtils {
+    private PasswordUtils() {
+        throw new IllegalStateException("Password utility class");
+    }
     public static String hashPasswordMD5(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -18,6 +21,5 @@ public class PasswordUtils {
         }
         return null;
     }
-
 
 }

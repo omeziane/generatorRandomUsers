@@ -21,13 +21,13 @@ public class UserServiceImpl implements UserService
 
    @Autowired
    UserRepository repository;
-   
+
    @Override
    public List<UserSearchDTO> findAllEntity()
    {
       return repository.findAllEntity();
    }
-
+   private Random random = new Random();  // SecureRandom is preferred to Random
    @Override
    public void insert(UserInsertDTO userDTO)
    {
@@ -113,7 +113,6 @@ public class UserServiceImpl implements UserService
    }
 
    private UserGeneratorDTO generateRandomUser() {
-      Random random = new Random();
 
       String[] firstNames = { "John", "Jane", "Michael", "Emma" };
       String[] lastNames = { "Doe", "Smith", "Johnson", "Brown" };
@@ -157,7 +156,6 @@ public class UserServiceImpl implements UserService
    }
 
    private <T> T getRandomElement(T[] array) {
-      Random random = new Random();
       int index = random.nextInt(array.length);
       return array[index];
    }
@@ -178,12 +176,10 @@ public class UserServiceImpl implements UserService
    }
 
    private long getRandomInRange(long min, long max) {
-      Random random = new Random();
       return min + (long) (random.nextDouble() * (max - min));
    }
 
    private String generateRandomPhoneNumber() {
-      Random random = new Random();
       StringBuilder phoneNumber = new StringBuilder();
 
       // Generate random digits for the phone number
@@ -196,7 +192,6 @@ public class UserServiceImpl implements UserService
    }
 
    private String generateRandomUsername(String firstName, String lastName) {
-      Random random = new Random();
       int randomNumber = random.nextInt(10000);
       return firstName.toLowerCase() + lastName.toLowerCase() + randomNumber;
    }
@@ -208,7 +203,6 @@ public class UserServiceImpl implements UserService
    }
 
    private String generateRandomPassword(int minLength, int maxLength) {
-      Random random = new Random();
       String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
       int length = random.nextInt(maxLength - minLength + 1) + minLength;
       StringBuilder password = new StringBuilder();

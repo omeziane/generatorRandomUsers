@@ -1,6 +1,7 @@
 package com.generator.user.app.security;
 
 import com.generator.user.app.dto.UserSearchDTO;
+import com.generator.user.app.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,15 +14,15 @@ public class AppUserDetails implements UserDetails
    private static final long serialVersionUID = -119525700066995907L;
 
    private UserSearchDTO user;
-   
+
    private Boolean enabled;
-   
+
    private List<GrantedAuthority> listAuthorities;
-   
+
    public AppUserDetails()
    {
    }
-   
+
    public AppUserDetails(UserSearchDTO user, List<GrantedAuthority> listAuthorities, Boolean enabled)
    {
       super();

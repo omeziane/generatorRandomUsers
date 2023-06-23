@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,22 +32,22 @@ public class UserLoginController
 {
 
    @Autowired
-   private AppUserDetailsService userDetailsService;
+   public AppUserDetailsService userDetailsService;
 
    @Autowired
-   private AuthenticationManager authenticationManager;
+   public AuthenticationManager authenticationManager;
 
    @Autowired
-   private JwtTokenUtil jwtTokenUtil;
+   public JwtTokenUtil jwtTokenUtil;
 
    @ApiOperation(value = "Login")
-   @ApiResponses(value = { 
+   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Successful operation", response = UserLoginResponse.class),
-      @ApiResponse(code = 204, message = "No records found"), 
+      @ApiResponse(code = 204, message = "No records found"),
       @ApiResponse(code = 401, message = "Access denied"),
-      @ApiResponse(code = 403, message = "You doesn't have permission"), 
+      @ApiResponse(code = 403, message = "You doesn't have permission"),
       @ApiResponse(code = 404, message = "Not found"),
-      @ApiResponse(code = 500, message = "Internal server error") 
+      @ApiResponse(code = 500, message = "Internal server error")
    })
    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
    public ResponseEntity<Object> login(@RequestBody UserLoginRequest request)
@@ -56,10 +58,10 @@ public class UserLoginController
       {
          validateRequest(request);
          authenticate(request.getUsername(), request.getPassword());
-         
+
          final AppUserDetails userDetails = (AppUserDetails) userDetailsService.loadUserByUsername(request.getUsername());
          final String token = jwtTokenUtil.generateToken(userDetails);
-         
+
          responseHeaders.set("Authorization", "Bearer " + token);
 
          if (userDetails == null || userDetails.getUser() == null)
@@ -77,27 +79,32 @@ public class UserLoginController
       return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(response);
    }
 
-   private void validateRequest(UserLoginRequest request) throws Exception
+   private void validateRequest(UserLoginRequest request)
    {
       if (request.getUsername() == null || "".equals(request.getUsername().trim()))
       {
-         throw new Exception("Username is required");
+         throw new UsernameRequiredException("Username is required");
       }
       if (request.getUsername() == null || "".equals(request.getPassword().trim()))
       {
-         throw new Exception("Password is required");
+         throw new UsernameRequiredException("Password is required");
       }
    }
 
-   private void authenticate(String username, String password) throws Exception
-   {
-      try
-      {
+   public String authenticate(String username, String password) {
+      try {
          authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-      }
-      catch (BadCredentialsException e)
-      {
+         final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+         final String token = jwtTokenUtil.generateToken(userDetails);
+         return token;
+      } catch (AuthenticationException e) {
          throw new BadCredentialsException("Bad credentials");
+      }
+   }
+
+   public class UsernameRequiredException extends RuntimeException {
+      public UsernameRequiredException(String message) {
+         super(message);
       }
    }
 
