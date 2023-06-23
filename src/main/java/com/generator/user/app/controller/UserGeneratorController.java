@@ -32,8 +32,13 @@ import java.util.List;
 @Api(tags = "User Management")
 public class UserGeneratorController
 {
+
    @Autowired
    UserService service;
+
+   private int recordsFailed = 0;
+   private boolean exceptionCaught = false;
+   private String errorMessage = "";
 
    @ApiOperation(value = "Generate Users", notes = "Generates a JSON file containing a specified number of users.")
    @ApiResponses(value = {
@@ -70,15 +75,11 @@ public class UserGeneratorController
       try {
          // Read the file content as a JSON tree
          ObjectMapper objectMapper = new ObjectMapper();
-         JsonNode jsonNode = objectMapper.readTree(file.getInputStream());
 
          // Logic to process the uploaded file and store the users in the database
          List<UserInsertDTO> users = processUploadedFile(file);
          int totalRecords = users.size();
          int recordsImported = 0;
-         int recordsFailed = 0;
-         boolean exceptionCaught = false;
-         String errorMessage = "";
 
          // Iterate through the users and attempt to save them in the database
          for (UserInsertDTO user : users) {
@@ -86,9 +87,7 @@ public class UserGeneratorController
                service.insert(user);
                recordsImported++;
             } catch (Exception e) {
-               recordsFailed++;
-               exceptionCaught = true;
-               errorMessage = e.getMessage();
+               handleInsertException(e);
             }
          }
 
@@ -115,6 +114,12 @@ public class UserGeneratorController
          // Other exceptions occurred
          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON file.");
       }
+   }
+
+   private void handleInsertException(Exception e) {
+      recordsFailed++;
+      exceptionCaught = true;
+      errorMessage = e.getMessage();
    }
 
    @ApiOperation(value = "Search")

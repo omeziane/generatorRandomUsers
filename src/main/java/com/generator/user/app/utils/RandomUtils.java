@@ -8,6 +8,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomUtils {
 
+    private RandomUtils() {
+        throw new IllegalStateException("Random utility class");
+    }
     private static final String ALLOWED_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int MIN_PASSWORD_LENGTH = 6;
     private static final int MAX_PASSWORD_LENGTH = 10;
@@ -17,6 +20,8 @@ public class RandomUtils {
     private static final String[] COUNTRIES = {"DE", "GB", "FR", "US", "MA"};
     private static final String[] JOB_POSITIONS = {"Software Engineer", "Product Manager", "Data Analyst", "Team Leader", "CEO"};
     private static final String[] ROLES = {"admin", "user"};
+
+    private static final String LINL_AVATAR_JPG = "https://example.com/avatar.jpg";
 
     private static final Random random = new Random();
 
@@ -46,7 +51,7 @@ public class RandomUtils {
     }
 
     public static String generateRandomImageUrl() {
-        return "https://example.com/avatar.jpg";
+        return LINL_AVATAR_JPG;
     }
 
     public static String generateRandomJobPosition() {
@@ -108,8 +113,7 @@ public class RandomUtils {
         return username.replaceAll("\\s+", ""); // Remove any whitespace
     }
 
-    private static String generateRandomString(String[] array) {
-        Random random = new Random();
+    public static String generateRandomString(String[] array) {
         int index = random.nextInt(array.length);
         return array[index];
     }
