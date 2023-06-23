@@ -11,7 +11,7 @@ To execute this project, execute MainApplication where located in com.generator.
 Open your browser and type
 
 ```
-http://localhost:8080/h2
+http://localhost:8080/h2-console/
 ```
 
 ### How to access Swagger UI
@@ -19,7 +19,7 @@ http://localhost:8080/h2
 Open your brownser and type 
 
 ```
-http://localhost:8080/swagger-ui/html
+http://localhost:8080/swagger-ui.html
 ```
 
 ## Deployment
