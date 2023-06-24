@@ -66,4 +66,12 @@ public class JwtTokenUtil implements Serializable
    {
       return !isTokenExpired(token);
    }
+
+   public void setSecret(String secret) {
+      this.secret = secret;
+   }
+
+   public String getSecret() {
+      return secret;
+   }
 }
